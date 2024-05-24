@@ -4,15 +4,19 @@ import CountryCard from "./CountryCard";
 import Pagination from "./common/Pagination";
 import Fuse from "fuse.js";
 import SearchInput from "./common/SearchInput";
+import CountryCardModal from "./CountryCardModal";
 
 interface ContainerProps {
   countries: Country[];
 }
+
 const Container = ({ countries }: ContainerProps) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [openModal, setOpenModal] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredCountries, setFilteredCountries] = useState(countries);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [selectedCountry, setSelectedCountry] = useState<Country>();
 
   const ITEMS_PER_PAGE = 25;
 
@@ -52,19 +56,51 @@ const Container = ({ countries }: ContainerProps) => {
   const handleNext = () => {
     setCurrentPage(oldPage => Math.min(oldPage + 1, totalPages));
   };
-  const handleSort = () => {
-    setSortOrder(oldSortOrder => (oldSortOrder === "asc" ? "desc" : "asc"));
+  const handleSortAsc = () => {
+    setSortOrder("asc");
+  };
+
+  const handleSortDesc = () => {
+    setSortOrder("desc");
+  };
+
+  const handleModalClose = () => {
+    setOpenModal(false);
+  };
+
+  const handleModalOpen = () => {
+    setOpenModal(true);
   };
   return (
     <div className="w-10/12 mx-auto">
       <div>
         <div className="text-4xl font-bold mt-10 inline-block">Countries Catalog Implementation</div>
         <SearchInput searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-        <button onClick={handleSort}>Sort by name ({sortOrder === "asc" ? "Ascending" : "Descending"})</button>
+        <div className="flex space-x-4 mt-5">
+          <button
+            onClick={handleSortAsc}
+            className="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            <i className="fas fa-sort-alpha-up pr-2"></i>
+            Sort Ascending
+          </button>
+          <button
+            onClick={handleSortDesc}
+            className="flex items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            <i className="fas fa-sort-alpha-down pr-2"></i>
+            Sort Descending
+          </button>
+        </div>
       </div>
       <div className="mt-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {currentCountries?.map((country: Country) => <CountryCard key={country.cca3} country={country} />)}
+          {currentCountries?.map((country: Country) => (
+            <CountryCard
+              key={country.cca3}
+              country={country}
+              openModal={handleModalOpen}
+              setSelectedCountry={setSelectedCountry}
+            />
+          ))}
         </div>
       </div>
       <Pagination
@@ -73,6 +109,7 @@ const Container = ({ countries }: ContainerProps) => {
         handlePrevious={handlePrevious}
         handleNext={handleNext}
       />
+      <CountryCardModal openModal={openModal} onCloseModal={handleModalClose} country={selectedCountry} />
     </div>
   );
 };

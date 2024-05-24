@@ -3,14 +3,23 @@ import React from "react";
 
 interface CountryCardProps {
   country: Country;
+  openModal: () => void;
+  setSelectedCountry: (country: Country) => void;
 }
-const CountryCard = ({ country }: CountryCardProps) => {
+const CountryCard = ({ country, openModal, setSelectedCountry }: CountryCardProps) => {
   return (
     <div key={country.cca3} className="bg-white shadow-md rounded-md p-4 space-y-4">
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <img className=" w-24 h-16" src={country.flags.png} alt={country.name.common} />
-          <h2 className="font-semibold text-lg">{country.name.common}</h2>
+          <div
+            className="font-semibold text-lg hover:text-blue-500 hover:underline cursor-pointer"
+            onClick={() => {
+              openModal();
+              setSelectedCountry(country);
+            }}>
+            {country.name.common}
+          </div>
         </div>
       </div>
       <div>
